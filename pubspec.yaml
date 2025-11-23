@@ -1,4 +1,4 @@
-name: devs_impacto_oline
+name: civicux_creator
 description: "A new Flutter project."
 publish_to: 'none'
 
@@ -37,3 +37,4 @@ flutter:
 
   assets:
     - .env
+    - assets/images/

@@ -6,14 +6,32 @@ class CamaraService {
   factory CamaraService() => _instance;
   CamaraService._internal();
 
-  final String _baseUrl = 'https://dadosabertos.camara.leg.br/api/v2/proposicoes';
+  final String _baseUrl =
+      'https://dadosabertos.camara.leg.br/api/v2/proposicoes';
 
-  Future<List<Map<String, dynamic>>> fetchProposals() async {
+  Future<List<Map<String, dynamic>>> fetchProposals({String? query}) async {
     try {
+      final queryParams = <String, String>{
+        'ordem': 'DESC',
+        'ordenarPor': 'id',
+        'siglaTipo': 'PL',
+      };
+
+      if (query != null && query.isNotEmpty) {
+        queryParams['keywords'] = query;
+        // If searching, we might want to broaden the search, but let's keep 2025 for now
+        // or maybe 2024/2025. The original code had 2025.
+        // Let's keep 2025 to be consistent with the initial view.
+        queryParams['ano'] = '2025';
+      } else {
+        queryParams['ano'] = '2025';
+      }
+
       final response = await http.get(
-        Uri.parse('$_baseUrl?ordem=DESC&ordenarPor=id&ano=2025&siglaTipo=PL'),
+        Uri.parse(_baseUrl).replace(queryParameters: queryParams),
         headers: {'accept': 'application/json'},
       );
+
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         if (data is Map && data['dados'] != null && data['dados'] is List) {

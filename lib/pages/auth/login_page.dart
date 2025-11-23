@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+
 import 'package:supabase_flutter/supabase_flutter.dart';
-import '../home/home_page.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -29,7 +28,9 @@ class _LoginPageState extends State<LoginPage> {
         );
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Conta criada! Verifique seu email ou faça login.')),
+            const SnackBar(
+              content: Text('Conta criada! Verifique seu email ou faça login.'),
+            ),
           );
           setState(() => _isSignUp = false);
         }
@@ -38,15 +39,11 @@ class _LoginPageState extends State<LoginPage> {
           email: email,
           password: password,
         );
-        // Navigation is handled by the AuthState listener in App
       }
     } on AuthException catch (e) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text(e.message),
-            backgroundColor: Colors.red,
-          ),
+          SnackBar(content: Text(e.message), backgroundColor: Colors.red),
         );
       }
     } catch (e) {
@@ -65,17 +62,18 @@ class _LoginPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    final primaryColor = Theme.of(context).primaryColor;
+    final theme = Theme.of(context);
+    final primaryColor = theme.primaryColor;
 
     return Scaffold(
       body: Container(
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           gradient: LinearGradient(
             begin: Alignment.topLeft,
             end: Alignment.bottomRight,
             colors: [
-              Colors.blue.shade50,
-              Colors.white,
+              Color(0xFFF0F4FF), // Very light blue-purple
+              Color(0xFFFAFAFA), // Off-white
             ],
           ),
         ),
@@ -85,145 +83,104 @@ class _LoginPageState extends State<LoginPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // Logo or Icon
-                Container(
-                  padding: const EdgeInsets.all(20),
-                  decoration: BoxDecoration(
-                    color: primaryColor.withOpacity(0.1),
-                    shape: BoxShape.circle,
-                  ),
-                  child: Icon(
-                    Icons.rocket_launch_rounded,
-                    size: 64,
-                    color: primaryColor,
-                  ),
+                // Logo
+                Hero(
+                  tag: 'app_logo',
+                  child: Image.asset('assets/images/logo.png', height: 100),
                 ),
                 const SizedBox(height: 32),
-                
+
                 // Title
                 Text(
-                  'Bem-vindo ao\nDevs Impacto',
+                  'CivicUX Creator',
                   textAlign: TextAlign.center,
-                  style: GoogleFonts.outfit(
-                    fontSize: 32,
+                  style: theme.textTheme.displaySmall?.copyWith(
                     fontWeight: FontWeight.bold,
-                    color: Colors.black87,
-                    height: 1.2,
+                    color: const Color(0xFF1A1A1A),
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
                 Text(
-                  _isSignUp ? 'Crie sua conta para começar' : 'Faça login para continuar',
-                  style: GoogleFonts.inter(
-                    fontSize: 16,
+                  _isSignUp
+                      ? 'Crie sua conta para começar'
+                      : 'Faça login para continuar',
+                  style: theme.textTheme.bodyLarge?.copyWith(
                     color: Colors.grey[600],
                   ),
                 ),
                 const SizedBox(height: 48),
 
-                // Form
-                Container(
-                  constraints: const BoxConstraints(maxWidth: 400),
-                  padding: const EdgeInsets.all(32),
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(24),
-                    boxShadow: [
-                      BoxShadow(
-                        color: primaryColor.withOpacity(0.1),
-                        blurRadius: 20,
-                        offset: const Offset(0, 10),
-                      ),
-                    ],
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.stretch,
-                    children: [
-                      TextField(
-                        controller: _emailController,
-                        decoration: InputDecoration(
-                          labelText: 'Email',
-                          prefixIcon: const Icon(Icons.email_outlined),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade200),
+                // Form Card
+                ConstrainedBox(
+                  constraints: const BoxConstraints(maxWidth: 420),
+                  child: Card(
+                    elevation: 4,
+                    shadowColor: Colors.black.withOpacity(0.05),
+                    child: Padding(
+                      padding: const EdgeInsets.all(40),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.stretch,
+                        children: [
+                          TextField(
+                            controller: _emailController,
+                            decoration: const InputDecoration(
+                              labelText: 'Email',
+                              prefixIcon: Icon(Icons.email_outlined),
+                            ),
+                            keyboardType: TextInputType.emailAddress,
                           ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade200),
+                          const SizedBox(height: 20),
+                          TextField(
+                            controller: _passwordController,
+                            decoration: const InputDecoration(
+                              labelText: 'Senha',
+                              prefixIcon: Icon(Icons.lock_outline),
+                            ),
+                            obscureText: true,
                           ),
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                        ),
-                        keyboardType: TextInputType.emailAddress,
-                      ),
-                      const SizedBox(height: 16),
-                      TextField(
-                        controller: _passwordController,
-                        decoration: InputDecoration(
-                          labelText: 'Senha',
-                          prefixIcon: const Icon(Icons.lock_outline),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade200),
-                          ),
-                          enabledBorder: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(12),
-                            borderSide: BorderSide(color: Colors.grey.shade200),
-                          ),
-                          filled: true,
-                          fillColor: Colors.grey.shade50,
-                        ),
-                        obscureText: true,
-                      ),
-                      const SizedBox(height: 24),
-                      
-                      SizedBox(
-                        height: 50,
-                        child: ElevatedButton(
-                          onPressed: _isLoading ? null : _authenticate,
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: primaryColor,
-                            foregroundColor: Colors.white,
-                            elevation: 0,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(12),
+                          const SizedBox(height: 32),
+
+                          SizedBox(
+                            height: 56,
+                            child: ElevatedButton(
+                              onPressed: _isLoading ? null : _authenticate,
+                              child: _isLoading
+                                  ? const SizedBox(
+                                      height: 24,
+                                      width: 24,
+                                      child: CircularProgressIndicator(
+                                        strokeWidth: 2.5,
+                                        color: Colors.white,
+                                      ),
+                                    )
+                                  : Text(
+                                      _isSignUp ? 'Criar Conta' : 'Entrar',
+                                      style: const TextStyle(fontSize: 16),
+                                    ),
                             ),
                           ),
-                          child: _isLoading
-                              ? const SizedBox(
-                                  height: 20,
-                                  width: 20,
-                                  child: CircularProgressIndicator(
-                                    strokeWidth: 2,
-                                    color: Colors.white,
-                                  ),
-                                )
-                              : Text(
-                                  _isSignUp ? 'Criar Conta' : 'Entrar',
-                                  style: GoogleFonts.inter(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                        ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                
+                const SizedBox(height: 32),
+
                 // Toggle Login/SignUp
                 TextButton(
                   onPressed: () => setState(() => _isSignUp = !_isSignUp),
                   child: RichText(
                     text: TextSpan(
-                      text: _isSignUp ? 'Já tem uma conta? ' : 'Não tem uma conta? ',
-                      style: GoogleFonts.inter(color: Colors.grey[600]),
+                      text: _isSignUp
+                          ? 'Já tem uma conta? '
+                          : 'Não tem uma conta? ',
+                      style: theme.textTheme.bodyMedium?.copyWith(
+                        color: Colors.grey[600],
+                      ),
                       children: [
                         TextSpan(
                           text: _isSignUp ? 'Entrar' : 'Cadastre-se',
-                          style: GoogleFonts.inter(
+                          style: theme.textTheme.bodyMedium?.copyWith(
                             color: primaryColor,
                             fontWeight: FontWeight.bold,
                           ),
