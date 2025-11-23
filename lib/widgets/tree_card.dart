@@ -1,8 +1,9 @@
 import 'dart:convert';
-import 'dart:typed_data';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:cross_file/cross_file.dart';
 import 'package:shimmer/shimmer.dart';
 import '../models/tree_node.dart';
 
@@ -23,18 +24,14 @@ class TreeCard extends StatelessWidget {
   Future<void> _shareToInstagram(BuildContext context) async {
     try {
       final description = node.description ?? 'Post Instagram';
-
       if (node.imageUrl != null && node.imageUrl!.startsWith('data:')) {
         final base64Data = node.imageUrl!.split(',')[1];
         final bytes = base64Decode(base64Data);
-
-        // Use XFile.fromData instead of File for web compatibility
         final xFile = XFile.fromData(
           bytes,
           name: 'instagram_post.png',
           mimeType: 'image/png',
         );
-
         await Share.shareXFiles([xFile], text: description);
       } else {
         await Share.share(description);
@@ -84,61 +81,46 @@ class TreeCard extends StatelessWidget {
                       ? Image.memory(
                           base64Decode(node.imageUrl!.split(',')[1]),
                           height: 300,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                         )
                       : Image.network(
                           node.imageUrl!,
                           height: 300,
-                          fit: BoxFit.cover,
+                          fit: BoxFit.contain,
                         ),
                 ),
-              Flexible(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(20),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              node.title,
-                              style: const TextStyle(
-                                fontSize: 20,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.black,
-                              ),
-                            ),
-                          ),
-                          IconButton(
-                            icon: const Icon(Icons.close),
-                            onPressed: () => Navigator.of(context).pop(),
-                          ),
-                        ],
+              Padding(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      node.title,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.black,
                       ),
-                      const SizedBox(height: 12),
-                      Text(
-                        node.description ?? '',
-                        style: const TextStyle(
-                          fontSize: 14,
-                          height: 1.5,
-                          color: Colors.black87,
-                        ),
+                    ),
+                    const SizedBox(height: 12),
+                    Text(
+                      node.description ?? '',
+                      style: const TextStyle(
+                        fontSize: 14,
+                        height: 1.5,
+                        color: Colors.black87,
                       ),
-                      const SizedBox(height: 16),
-                      ElevatedButton.icon(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                          _shareToInstagram(context);
-                        },
-                        icon: const Icon(Icons.share),
-                        label: const Text('Compartilhar'),
-                        style: ElevatedButton.styleFrom(
-                          minimumSize: const Size.fromHeight(48),
-                        ),
-                      ),
-                    ],
-                  ),
+                    ),
+                    const SizedBox(height: 16),
+                    ElevatedButton.icon(
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                        _shareToInstagram(context);
+                      },
+                      icon: const Icon(Icons.share),
+                      label: const Text('Compartilhar'),
+                    ),
+                  ],
                 ),
               ),
             ],
@@ -151,7 +133,6 @@ class TreeCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-
     if (node.isPost) {
       return GestureDetector(
         onTap: () => _showFullPost(context),
@@ -170,74 +151,67 @@ class TreeCard extends StatelessWidget {
             ],
           ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Stack(
-                children: [
-                  Container(
-                    height: 160,
-                    width: double.infinity,
-                    decoration: BoxDecoration(
-                      color: Colors.grey[100],
-                      borderRadius: const BorderRadius.vertical(
-                        top: Radius.circular(20),
-                      ),
-                      image: node.imageUrl != null
-                          ? (node.imageUrl!.startsWith('data:')
-                                ? DecorationImage(
-                                    image: MemoryImage(
-                                      base64Decode(
-                                        node.imageUrl!.split(',')[1],
-                                      ),
-                                    ),
-                                    fit: BoxFit.cover,
-                                  )
-                                : DecorationImage(
-                                    image: NetworkImage(node.imageUrl!),
-                                    fit: BoxFit.cover,
-                                  ))
-                          : null,
-                    ),
-                    child: node.imageUrl == null
-                        ? Shimmer.fromColors(
-                            baseColor: Colors.grey[300]!,
-                            highlightColor: Colors.grey[100]!,
-                            child: Container(color: Colors.white),
-                          )
-                        : null,
+              // Image container – square, BoxFit.contain
+              Container(
+                height: 220,
+                width: double.infinity,
+                decoration: BoxDecoration(
+                  color: Colors.grey[100],
+                  borderRadius: const BorderRadius.vertical(
+                    top: Radius.circular(20),
                   ),
-                  Positioned(
-                    top: 12,
-                    right: 12,
-                    child: Material(
-                      color: Colors.transparent,
-                      child: InkWell(
-                        onTap: () => _shareToInstagram(context),
-                        borderRadius: BorderRadius.circular(24),
-                        child: Container(
-                          padding: const EdgeInsets.all(8),
-                          decoration: BoxDecoration(
-                            color: Colors.white.withOpacity(0.9),
-                            shape: BoxShape.circle,
-                            boxShadow: [
-                              BoxShadow(
-                                color: Colors.black.withOpacity(0.1),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
-                            ],
-                          ),
-                          child: Icon(
-                            Icons.share_rounded,
-                            color: theme.primaryColor,
-                            size: 18,
-                          ),
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
+                  image: node.imageUrl != null
+                      ? (node.imageUrl!.startsWith('data:')
+                            ? DecorationImage(
+                                image: MemoryImage(
+                                  base64Decode(node.imageUrl!.split(',')[1]),
+                                ),
+                                fit: BoxFit.contain,
+                              )
+                            : DecorationImage(
+                                image: NetworkImage(node.imageUrl!),
+                                fit: BoxFit.contain,
+                              ))
+                      : null,
+                ),
+                child: node.imageUrl == null
+                    ? Shimmer.fromColors(
+                        baseColor: Colors.grey[300]!,
+                        highlightColor: Colors.grey[100]!,
+                        child: Container(color: Colors.white),
+                      )
+                    : null,
               ),
+              // Share button overlay
+              Align(
+                alignment: Alignment.topRight,
+                child: InkWell(
+                  onTap: () => _shareToInstagram(context),
+                  borderRadius: BorderRadius.circular(24),
+                  child: Container(
+                    margin: const EdgeInsets.all(8),
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.9),
+                      shape: BoxShape.circle,
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 4,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: Icon(
+                      Icons.share_rounded,
+                      color: theme.primaryColor,
+                      size: 18,
+                    ),
+                  ),
+                ),
+              ),
+              // Text content
               Expanded(
                 child: Padding(
                   padding: const EdgeInsets.all(16.0),
@@ -274,7 +248,7 @@ class TreeCard extends StatelessWidget {
         ),
       );
     }
-
+    // Non‑post node representation
     return Row(
       mainAxisSize: MainAxisSize.min,
       crossAxisAlignment: CrossAxisAlignment.center,
