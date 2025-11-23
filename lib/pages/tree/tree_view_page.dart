@@ -464,7 +464,7 @@ class TreePainter extends CustomPainter {
     // 150 (card width) + 12 (button offset center) = 162
     // Adjusted for better visual connection
     final parentCenter =
-        node.position + const Offset(180, 40); // Center right of card
+        node.position + const Offset(190, 40); // Center right of card
 
     for (var child in node.children) {
       final childCenter =

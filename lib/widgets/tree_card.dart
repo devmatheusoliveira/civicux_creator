@@ -275,8 +275,9 @@ class TreeCard extends StatelessWidget {
       );
     }
 
-    return Stack(
-      clipBehavior: Clip.none,
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.center,
       children: [
         Container(
           width: 160,
@@ -317,14 +318,13 @@ class TreeCard extends StatelessWidget {
           ),
         ),
         if (showAddButton)
-          Positioned(
-            right: -14,
-            top: 0,
-            bottom: 0,
-            child: Center(
-              child: InkWell(
-                onTap: onTap,
-                borderRadius: BorderRadius.circular(20),
+          Material(
+            color: Colors.transparent,
+            child: InkWell(
+              onTap: onTap,
+              borderRadius: BorderRadius.circular(24),
+              child: Container(
+                padding: const EdgeInsets.all(8),
                 child: Container(
                   width: 28,
                   height: 28,
