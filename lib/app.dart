@@ -4,6 +4,7 @@ import 'pages/tree/setup_page.dart';
 import 'theme/app_theme.dart';
 import 'pages/home/home_page.dart';
 import 'pages/auth/login_page.dart';
+import 'pages/settings/settings_page.dart';
 
 class DevsImpactoApp extends StatelessWidget {
   const DevsImpactoApp({super.key});
@@ -14,6 +15,10 @@ class DevsImpactoApp extends StatelessWidget {
       title: 'Devs Impacto Online',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
+      routes: {
+        '/settings': (context) => const SettingsPage(),
+        '/setup': (context) => const SetupPage(),
+      },
       home: StreamBuilder<AuthState>(
         stream: Supabase.instance.client.auth.onAuthStateChange,
         builder: (context, snapshot) {
@@ -22,7 +27,7 @@ class DevsImpactoApp extends StatelessWidget {
               body: Center(child: CircularProgressIndicator()),
             );
           }
-          
+
           final session = snapshot.data?.session;
           if (session != null) {
             return const HomePage();

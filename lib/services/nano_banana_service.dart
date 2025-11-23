@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'config_service.dart';
 
 class NanoBananaService {
   static final NanoBananaService _instance = NanoBananaService._internal();
@@ -9,14 +9,14 @@ class NanoBananaService {
 
   final String _baseUrl =
       'https://generativelanguage.googleapis.com/v1beta/models/gemini-3-pro-image-preview:generateContent';
+  final ConfigService _configService = ConfigService();
 
   Future<String?> generateImage(String prompt) async {
-    if (!dotenv.isInitialized) {
-      await dotenv.load(fileName: '.env');
-    }
-    final apiKey = dotenv.env['GEMINI_API_KEY'];
-    if (apiKey == null) {
-      print('GEMINI_API_KEY not found in .env');
+    // Busca a chave do Supabase
+    final apiKey = await _configService.getGeminiApiKey();
+
+    if (apiKey == null || apiKey.isEmpty) {
+      print('GEMINI_API_KEY não configurada');
       return null;
     }
 
@@ -29,17 +29,14 @@ class NanoBananaService {
             {
               'role': 'user',
               'parts': [
-                {'text': prompt}
-              ]
-            }
+                {'text': prompt},
+              ],
+            },
           ],
           'generationConfig': {
             'responseModalities': ['IMAGE'],
-            'imageConfig': {
-              'aspectRatio': '1:1',
-              'image_size': '1K'
-            }
-          }
+            'imageConfig': {'aspectRatio': '1:1', 'image_size': '1K'},
+          },
         }),
       );
 

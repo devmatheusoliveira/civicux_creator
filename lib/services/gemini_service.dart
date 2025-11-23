@@ -1,55 +1,53 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'config_service.dart';
 
 class GeminiService {
   static final GeminiService _instance = GeminiService._internal();
   factory GeminiService() => _instance;
   GeminiService._internal();
 
-  final String _baseUrl = 'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  final String _baseUrl =
+      'https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent';
+  final ConfigService _configService = ConfigService();
 
-  Future<String> generatePostContent(String prompt, String audience, {String? pdfBase64, String? systemInstruction}) async {
-    if (!dotenv.isInitialized) {
-      await dotenv.load(fileName: ".env");
-    }
-    final apiKey = dotenv.env['GEMINI_API_KEY'];
-    if (apiKey == null) {
-      return 'Erro: GEMINI_API_KEY não encontrada no .env';
+  Future<String> generatePostContent(
+    String prompt,
+    String audience, {
+    String? pdfBase64,
+    String? systemInstruction,
+  }) async {
+    // Busca a chave do Supabase
+    final apiKey = await _configService.getGeminiApiKey();
+
+    if (apiKey == null || apiKey.isEmpty) {
+      return 'Erro: GEMINI_API_KEY não configurada. Por favor, configure a chave nas configurações.';
     }
 
     List<Map<String, dynamic>> parts = [
-      {"text": prompt}
+      {"text": prompt},
     ];
 
     if (pdfBase64 != null) {
       parts.add({
-        "inlineData": {
-          "mimeType": "application/pdf",
-          "data": pdfBase64
-        }
+        "inlineData": {"mimeType": "application/pdf", "data": pdfBase64},
       });
     }
 
     final Map<String, dynamic> requestBody = {
       "contents": [
-        {
-          "role": "user",
-          "parts": parts
-        }
+        {"role": "user", "parts": parts},
       ],
       "tools": [
-        {
-          "googleSearch": {}
-        }
-      ]
+        {"googleSearch": {}},
+      ],
     };
 
     if (systemInstruction != null) {
       requestBody["systemInstruction"] = {
         "parts": [
-          {"text": systemInstruction}
-        ]
+          {"text": systemInstruction},
+        ],
       };
     }
 

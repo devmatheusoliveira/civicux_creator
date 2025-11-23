@@ -88,6 +88,14 @@ class _HomePageState extends State<HomePage> {
         centerTitle: true,
         actions: [
           IconButton(
+            icon: const Icon(Icons.settings_outlined),
+            tooltip: 'Configurações',
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
+          ),
+          const SizedBox(width: 8),
+          IconButton(
             icon: const Icon(Icons.notifications_outlined),
             onPressed: () {}, // Placeholder for notifications
           ),
