@@ -1,10 +1,9 @@
 import 'dart:convert';
-import 'dart:io';
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:share_plus/share_plus.dart';
-import 'package:path_provider/path_provider.dart';
+import 'package:shimmer/shimmer.dart';
 import '../models/tree_node.dart';
 
 class TreeCard extends StatelessWidget {
@@ -29,11 +28,14 @@ class TreeCard extends StatelessWidget {
         final base64Data = node.imageUrl!.split(',')[1];
         final bytes = base64Decode(base64Data);
 
-        final tempDir = await getTemporaryDirectory();
-        final file = File('${tempDir.path}/instagram_post.png');
-        await file.writeAsBytes(bytes);
+        // Use XFile.fromData instead of File for web compatibility
+        final xFile = XFile.fromData(
+          bytes,
+          name: 'instagram_post.png',
+          mimeType: 'image/png',
+        );
 
-        await Share.shareXFiles([XFile(file.path)], text: description);
+        await Share.shareXFiles([xFile], text: description);
       } else {
         await Share.share(description);
       }
@@ -197,12 +199,10 @@ class TreeCard extends StatelessWidget {
                           : null,
                     ),
                     child: node.imageUrl == null
-                        ? Center(
-                            child: Icon(
-                              Icons.image_outlined,
-                              size: 48,
-                              color: Colors.grey[300],
-                            ),
+                        ? Shimmer.fromColors(
+                            baseColor: Colors.grey[300]!,
+                            highlightColor: Colors.grey[100]!,
+                            child: Container(color: Colors.white),
                           )
                         : null,
                   ),

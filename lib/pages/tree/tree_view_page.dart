@@ -122,7 +122,7 @@ class _TreeViewPageState extends State<TreeViewPage> {
       id: const Uuid().v4(),
       title: 'Gerando conteúdo...',
       isPost: true,
-      imageUrl: 'https://picsum.photos/200/300', // Mock image for now
+      // imageUrl removed to trigger shimmer
       description: 'Aguarde, estamos criando o post...',
     );
 
