@@ -33,8 +33,8 @@ Aplicativo desenvolvido para democratizar o acesso à informação legislativa, 
 
 1. **Clone o repositório**
    ```bash
-   git clone <seu-repositorio>
-   cd devs_impacto_oline
+   git clone https://github.com/devmatheusoliveira/civicux_creator/
+   cd civicux_creator
    ```
 
 2. **Configure as Variáveis de Ambiente**
