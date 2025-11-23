@@ -36,12 +36,18 @@ class _TreeViewPageState extends State<TreeViewPage> {
     rootNode = TreeNode(
       id: const Uuid().v4(),
       title: widget.initialRootTitle,
-      position: const Offset(50, 300),
+      position: const Offset(2500, 2500),
     );
 
     if (widget.proposalId != null) {
       _loadProposalDetails();
     }
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final matrix = Matrix4.identity();
+      matrix.translate(-2000.0, -2000.0);
+      _transformationController.value = matrix;
+    });
   }
 
   Future<void> _loadProposalDetails() async {
@@ -253,7 +259,7 @@ Requirements: Clear visual hierarchy, eye-catching colors, professional design a
     // This needs to be improved for a real tree, but works for a simple demo
     // We'll traverse and set positions relative to parent
 
-    _layoutNode(rootNode, 50, 300, 300);
+    _layoutNode(rootNode, 2500, 2500, 300);
   }
 
   void _layoutNode(TreeNode node, double x, double y, double availableHeight) {
@@ -345,6 +351,7 @@ Requirements: Clear visual hierarchy, eye-catching colors, professional design a
               width: 5000,
               height: 5000,
               child: Stack(
+                clipBehavior: Clip.none,
                 children: [
                   // Draw lines
                   CustomPaint(
@@ -398,7 +405,15 @@ Requirements: Clear visual hierarchy, eye-catching colors, professional design a
                 FloatingActionButton(
                   heroTag: 'center',
                   onPressed: () {
-                    _transformationController.value = Matrix4.identity();
+                    final matrix = Matrix4.identity();
+                    // Center on the 5000x5000 canvas (approximate center of screen)
+                    // Assuming screen center is roughly offset by half of canvas size
+                    // But simpler is just identity which puts (0,0) at top left.
+                    // To center (2500, 2500), we need to translate by -2500 + screenWidth/2.
+                    // For now, let's just reset to identity which shows top-left, but since we moved content to 2500,2500 it might be off-screen.
+                    // We should translate to show the content.
+                    matrix.translate(-2000.0, -2000.0);
+                    _transformationController.value = matrix;
                   },
                   backgroundColor: theme.primaryColor,
                   child: const Icon(Icons.center_focus_strong_rounded),
