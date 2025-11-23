@@ -10,7 +10,6 @@ if [ ! -d flutter ]; then
   git clone https://github.com/flutter/flutter.git
 fi
 
-# 3. Configura e baixa dependências
-./flutter/bin/flutter build web --release
-flutter config --enable-web
-flutter pub get
+
+./flutter/bin/flutter config --enable-web
+./flutter/bin/flutter pub get
